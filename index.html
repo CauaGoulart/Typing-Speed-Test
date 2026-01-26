@@ -2,56 +2,103 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- displays site properly based on user's device -->
-
-  <link rel="icon" type="image/png" sizes="32x32" href="./assets/images/favicon-32x32.png">
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Frontend Mentor | Typing Speed Test</title>
 
-  <!-- Feel free to remove these styles or customise in your own stylesheet 👍 -->
-  <style>
-    .attribution { font-size: 11px; text-align: center; }
-    .attribution a { color: hsl(228, 45%, 44%); }
-  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  Personal best: <!-- PB --> WPM
+<div class="container">
 
-  WPM: <!-- WPM -->
-  Accuracy: <!-- Accuracy -->
-  Time: <!-- Time -->
+  <header>
+    <div class="logo-area">
+      <i class="fa-solid fa-keyboard"></i>
+      <div>
+        <h1>Typing Speed Test</h1>
+        <p class="subtitle">Type as fast as you can in 60 seconds</p>
+      </div>
+    </div>
 
-  Difficulty:
-  Easy
-  Medium
-  Hard
+    <div class="personal-best">
+      <i class="fa-solid fa-trophy"></i>
+      <span>Personal best: <strong id="pb-score">92 WPM</strong></span>
+    </div>
+  </header>
 
-  Mode:
-  Timed (60s)
-  Passage
+  <section class="controls-bar">
+    <div class="live-stats">
+      <div class="stat-item">WPM: <span id="wpm">40</span></div>
+      <div class="stat-item">Accuracy: <span id="accuracy" class="highlight-red">94%</span></div>
+      <div class="stat-item">Time: <span id="time" class="highlight-yellow">0:46</span></div>
+    </div>
 
-  <!-- Passage -->
+    <div class="settings">
+      <div class="setting-group">
+        <span class="label">Difficulty:</span>
+        <div class="toggle-buttons">
+          <button class="btn active">Easy</button>
+          <button class="btn">Medium</button>
+          <button class="btn">Hard</button>
+        </div>
+      </div>
 
-  Start Typing Test
-  Or click the text and start typing
+      <div class="setting-group">
+        <span class="label">Mode:</span>
+        <div class="toggle-buttons">
+          <button class="btn active">Timed (60s)</button>
+          <button class="btn">Passage</button>
+        </div>
+      </div>
+    </div>
+  </section>
 
-  <!-- Test Complete Start -->
+  <main class="typing-area">
+    <div id="text-display" class="text-display">
+      <span class="correct">The</span> <span class="correct">archaeological</span> <span class="correct">expedition</span>
+      <span class="error">un<span class="error-underline">ea</span>rthed</span> artifacts that complicated
+      <span class="current-word">prev<span class="caret">|</span>ailing</span> theories about Bronze Age trade networks...
+    </div>
 
-  Test Complete!
-  Solid run. Keep pushing to beat your high score.
+    <input type="text" id="input-field" class="input-field">
+  </main>
 
-  WPM: <!-- WPM -->
-  Accuracy: <!-- Accuracy -->
-  Characters: <!-- Correct/Incorrect -->
-
-  Go Again
-  
-  <!-- Test Complete End -->
-
-  <div class="attribution">
-    Challenge by <a href="https://www.frontendmentor.io?ref=challenge">Frontend Mentor</a>. 
-    Coded by <a href="#">Your Name Here</a>.
+  <div class="footer-controls">
+    <button id="restart-btn" class="restart-btn">
+      Restart Test <i class="fa-solid fa-rotate-left"></i>
+    </button>
   </div>
+
+</div> <div id="results-modal" class="modal-overlay hidden">
+  <div class="modal-content">
+    <h2>Test Complete!</h2>
+    <p>Solid run. Keep pushing to beat your high score.</p>
+
+    <div class="results-grid">
+      <div class="result-box">
+        <span class="result-label">WPM</span>
+        <span class="result-value" id="final-wpm">0</span>
+      </div>
+      <div class="result-box">
+        <span class="result-label">Accuracy</span>
+        <span class="result-value" id="final-accuracy">0%</span>
+      </div>
+      <div class="result-box">
+        <span class="result-label">Characters</span>
+        <span class="result-value" id="final-chars">0/0</span>
+      </div>
+    </div>
+
+    <button class="primary-btn" onclick="location.reload()">Go Again</button>
+  </div>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
