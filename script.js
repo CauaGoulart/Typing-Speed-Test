@@ -145,3 +145,23 @@ function initTyping() {
             }
 
 }
+
+function initTimer() {
+    if (currentMode === 'timed') {
+        if (timeLeft > 0) {
+            timeLeft--;
+            timeTag.innerText = formatTime(timeLeft);
+            let wpm = Math.round(((charIndex - mistakes) / 5) / ((maxTime - timeLeft) / 60));
+            wpmTag.innerText = wpm;
+        } else {
+            clearInterval(timer);
+            finishGame();
+        }
+    } else {
+        // Passage Mode (Conta pra cima)
+        timerElapsed++;
+        timeTag.innerText = formatTime(timerElapsed);
+        let wpm = Math.round(((charIndex - mistakes) / 5) / (timerElapsed / 60));
+        wpmTag.innerText = wpm;
+    }
+}
