@@ -158,7 +158,6 @@ function initTimer() {
             finishGame();
         }
     } else {
-        // Passage Mode (Conta pra cima)
         timerElapsed++;
         timeTag.innerText = formatTime(timerElapsed);
         let wpm = Math.round(((charIndex - mistakes) / 5) / (timerElapsed / 60));
