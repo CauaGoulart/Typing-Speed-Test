@@ -91,3 +91,57 @@ function loadParagraph() {
     textDisplay.addEventListener("click", () => inputField.focus());
     document.addEventListener("keydown", () => inputField.focus());
 }
+
+function initTyping() {
+    let characters = textDisplay.querySelectorAll("span");
+    let typedChar = inputField.value.split("")[charIndex];
+
+    if(currentMode === 'timed' && timeLeft <=0) return;
+    if (charIndex >= characters.length) {
+            finishGame();
+            return;
+        }
+
+    if(!isTyping) {
+       timer = setInterval(initTimer, 1000);
+       isTyping = true;
+    }
+
+    if (typedChar == null) {
+            if (charIndex > 0) {
+                charIndex--;
+                if (characters[charIndex].classList.contains("error")) {
+                    mistakes--;
+                }
+                characters[charIndex].classList.remove("correct", "error");
+            }
+        } else {
+            if (characters[charIndex].innerText === typedChar) {
+                characters[charIndex].classList.add("correct");
+            } else {
+                mistakes++;
+                characters[charIndex].classList.add("error");
+            }
+            charIndex++;
+        }
+
+        characters.forEach(span => span.classList.remove("cursor-active"));
+            if (characters[charIndex]) {
+                characters[charIndex].classList.add("cursor-active");
+            }
+
+            let timeSpent = currentMode === 'timed' ? (maxTime - timeLeft) : timerElapsed;
+            timeSpent = timeSpent === 0 ? 1 : timeSpent;
+
+            let wpm = Math.round(((charIndex - mistakes) / 5) / (timeSpent / 60));
+            wpm = wpm < 0 || !wpm || wpm === Infinity ? 0 : wpm;
+
+            wpmTag.innerText = wpm;
+            accuracyTag.innerText = Math.round(((charIndex - mistakes) / charIndex) * 100) + "%";
+
+            if (charIndex === characters.length) {
+                clearInterval(timer);
+                finishGame();
+            }
+
+}
