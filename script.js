@@ -1,3 +1,4 @@
+// --- 1. BANCO DE DADOS DE TEXTOS ---
 const DB = {
     "easy": [
         { "text": "The sun rose over the quiet town. Birds sang in the trees as people woke up and started their day. It was going to be a warm and sunny morning." },
@@ -38,7 +39,6 @@ const DB = {
 };
 
 // --- 2. SELETORES DOM ---
-
 const textDisplay = document.getElementById("text-display");
 const inputField = document.getElementById("input-field");
 const restartBtn = document.getElementById("restart-btn");
@@ -55,6 +55,7 @@ const finalChars = document.getElementById("final-chars");
 const difficultyBtns = document.querySelectorAll(".setting-group:nth-child(1) .btn");
 const modeBtns = document.querySelectorAll(".setting-group:nth-child(2) .btn");
 
+// --- 3. VARIÁVEIS DE ESTADO ---
 let timer;
 let maxTime = 60;
 let timeLeft = maxTime;
@@ -64,6 +65,8 @@ let isTyping = false;
 let currentDifficulty = "easy";
 let currentMode = "timed";
 let timerElapsed = 0;
+
+// --- 4. INICIALIZAÇÃO ---
 
 function loadHighScore() {
     const score = localStorage.getItem("typing-pb");
@@ -77,17 +80,16 @@ function loadHighScore() {
 function loadParagraph() {
     const paragraphs = DB[currentDifficulty];
     const randIndex = Math.floor(Math.random() * paragraphs.length);
-
+    
     textDisplay.innerHTML = "";
-
     paragraphs[randIndex].text.split("").forEach(char => {
         let span = document.createElement("span");
         span.innerText = char;
         textDisplay.appendChild(span);
     });
-
+    
     textDisplay.querySelectorAll("span")[0].classList.add("cursor-active");
-
+    
     textDisplay.addEventListener("click", () => inputField.focus());
     document.addEventListener("keydown", () => inputField.focus());
 }
@@ -96,54 +98,54 @@ function initTyping() {
     let characters = textDisplay.querySelectorAll("span");
     let typedChar = inputField.value.split("")[charIndex];
 
-    if(currentMode === 'timed' && timeLeft <=0) return;
-    if (charIndex >= characters.length) {
-            finishGame();
-            return;
-        }
+    if (currentMode === 'timed' && timeLeft <= 0) return;
+    if (charIndex >= characters.length) { // Fim do texto (Passage Mode)
+        finishGame();
+        return;
+    }
 
-    if(!isTyping) {
-       timer = setInterval(initTimer, 1000);
-       isTyping = true;
+    if (!isTyping) {
+        timer = setInterval(initTimer, 1000);
+        isTyping = true;
     }
 
     if (typedChar == null) {
-            if (charIndex > 0) {
-                charIndex--;
-                if (characters[charIndex].classList.contains("error")) {
-                    mistakes--;
-                }
-                characters[charIndex].classList.remove("correct", "error");
+        if (charIndex > 0) {
+            charIndex--;
+            if (characters[charIndex].classList.contains("error")) {
+                mistakes--;
             }
-        } else {
-            if (characters[charIndex].innerText === typedChar) {
-                characters[charIndex].classList.add("correct");
-            } else {
-                mistakes++;
-                characters[charIndex].classList.add("error");
-            }
-            charIndex++;
+            characters[charIndex].classList.remove("correct", "error");
         }
+    } else {
 
-        characters.forEach(span => span.classList.remove("cursor-active"));
-            if (characters[charIndex]) {
-                characters[charIndex].classList.add("cursor-active");
-            }
+        if (characters[charIndex].innerText === typedChar) {
+            characters[charIndex].classList.add("correct");
+        } else {
+            mistakes++;
+            characters[charIndex].classList.add("error");
+        }
+        charIndex++;
+    }
 
-            let timeSpent = currentMode === 'timed' ? (maxTime - timeLeft) : timerElapsed;
-            timeSpent = timeSpent === 0 ? 1 : timeSpent;
+    characters.forEach(span => span.classList.remove("cursor-active"));
+    if (characters[charIndex]) {
+        characters[charIndex].classList.add("cursor-active");
+    }
 
-            let wpm = Math.round(((charIndex - mistakes) / 5) / (timeSpent / 60));
-            wpm = wpm < 0 || !wpm || wpm === Infinity ? 0 : wpm;
-
-            wpmTag.innerText = wpm;
-            accuracyTag.innerText = Math.round(((charIndex - mistakes) / charIndex) * 100) + "%";
-
-            if (charIndex === characters.length) {
-                clearInterval(timer);
-                finishGame();
-            }
-
+    let timeSpent = currentMode === 'timed' ? (maxTime - timeLeft) : timerElapsed;
+    timeSpent = timeSpent === 0 ? 1 : timeSpent;
+    
+    let wpm = Math.round(((charIndex - mistakes) / 5) / (timeSpent / 60));
+    wpm = wpm < 0 || !wpm || wpm === Infinity ? 0 : wpm;
+    
+    wpmTag.innerText = wpm;
+    accuracyTag.innerText = Math.round(((charIndex - mistakes) / charIndex) * 100) + "%";
+    
+    if (charIndex === characters.length) {
+        clearInterval(timer);
+        finishGame();
+    }
 }
 
 function initTimer() {
@@ -164,3 +166,149 @@ function initTimer() {
         wpmTag.innerText = wpm;
     }
 }
+
+function formatTime(seconds) {
+    let min = Math.floor(seconds / 60);
+    let sec = seconds % 60;
+    return `${min}:${sec < 10 ? "0" + sec : sec}`;
+}
+
+function resetGame() {
+    loadParagraph();
+    clearInterval(timer);
+    timeLeft = maxTime;
+    timerElapsed = 0;
+    charIndex = mistakes = 0;
+    isTyping = false;
+    inputField.value = "";
+    
+    timeTag.innerText = currentMode === 'timed' ? formatTime(maxTime) : "0:00";
+    wpmTag.innerText = 0;
+    accuracyTag.innerText = "100%";
+    modal.classList.remove("show");
+    modal.classList.add("hidden");
+    inputField.focus();
+}
+
+function finishGame() {
+    modal.classList.remove("hidden");
+    modal.classList.add("show");
+    
+    let timeSpent = currentMode === 'timed' ? (maxTime - timeLeft) : timerElapsed;
+    if(timeSpent === 0) timeSpent = 60; // Fallback
+
+    let wpm = Math.round(((charIndex - mistakes) / 5) / (timeSpent / 60));
+    let accuracy = Math.round(((charIndex - mistakes) / charIndex) * 100);
+    
+    if (isNaN(accuracy)) accuracy = 0;
+    if (isNaN(wpm) || wpm < 0) wpm = 0;
+
+    finalWpm.innerText = wpm;
+    finalAccuracy.innerText = `${accuracy}%`;
+    finalChars.innerText = `${charIndex - mistakes}/${mistakes}`;
+
+    let currentBest = localStorage.getItem("typing-pb");
+    let title = modal.querySelector("h2");
+    let msg = modal.querySelector("p");
+
+    if (!currentBest) {
+        localStorage.setItem("typing-pb", wpm);
+        pbScoreTag.innerText = `${wpm} WPM`;
+        title.innerText = "Baseline Established!";
+        msg.innerText = "Great start! Keep practicing to improve.";
+    } else if (wpm > parseInt(currentBest)) {
+        localStorage.setItem("typing-pb", wpm);
+        pbScoreTag.innerText = `${wpm} WPM`;
+        title.innerText = "High Score Smashed!";
+        msg.innerText = `You beat your previous best of ${currentBest} WPM!`;
+        fireConfetti(); // ESTOURAR CONFETES!
+    } else {
+        title.innerText = "Test Complete!";
+        msg.innerText = "Solid run. Keep pushing to beat your high score.";
+    }
+}
+
+// --- 5. EFEITO DE CONFETE (Sem bibliotecas) ---
+function fireConfetti() {
+    const count = 200;
+    const defaults = { origin: { y: 0.7 } };
+
+    const canvas = document.createElement('canvas');
+    canvas.style.position = 'fixed';
+    canvas.style.top = '0';
+    canvas.style.left = '0';
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    canvas.style.pointerEvents = 'none';
+    canvas.style.zIndex = '999';
+    document.body.appendChild(canvas);
+    
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const particles = [];
+    const colors = ['#e2b714', '#4ade80', '#f87171', '#ffffff'];
+
+    for (let i = 0; i < count; i++) {
+        particles.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height - canvas.height,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            size: Math.random() * 5 + 2,
+            speedY: Math.random() * 3 + 2,
+            speedX: Math.random() * 2 - 1
+        });
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let active = false;
+        particles.forEach(p => {
+            p.y += p.speedY;
+            p.x += p.speedX;
+            ctx.fillStyle = p.color;
+            ctx.fillRect(p.x, p.y, p.size, p.size);
+            if (p.y < canvas.height) active = true;
+        });
+
+        if (active) requestAnimationFrame(animate);
+        else document.body.removeChild(canvas);
+    }
+    animate();
+}
+
+// --- 6. EVENT LISTENERS ---
+
+inputField.addEventListener("input", initTyping);
+
+restartBtn.addEventListener("click", resetGame);
+
+difficultyBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+        difficultyBtns.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        
+        currentDifficulty = btn.innerText.toLowerCase();
+        resetGame();
+    });
+});
+
+modeBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+        modeBtns.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+
+        if (btn.innerText.includes("Timed")) {
+            currentMode = "timed";
+            timeTag.classList.remove("highlight-yellow");
+        } else {
+            currentMode = "passage";
+            timeTag.classList.add("highlight-yellow");
+        }
+        resetGame();
+    });
+});
+
+loadHighScore();
+resetGame();
