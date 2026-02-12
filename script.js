@@ -99,7 +99,7 @@ function initTyping() {
     let typedChar = inputField.value.split("")[charIndex];
 
     if (currentMode === 'timed' && timeLeft <= 0) return;
-    if (charIndex >= characters.length) { // Fim do texto (Passage Mode)
+    if (charIndex >= characters.length) {
         finishGame();
         return;
     }
@@ -195,7 +195,7 @@ function finishGame() {
     modal.classList.add("show");
     
     let timeSpent = currentMode === 'timed' ? (maxTime - timeLeft) : timerElapsed;
-    if(timeSpent === 0) timeSpent = 60; // Fallback
+    if(timeSpent === 0) timeSpent = 60;
 
     let wpm = Math.round(((charIndex - mistakes) / 5) / (timeSpent / 60));
     let accuracy = Math.round(((charIndex - mistakes) / charIndex) * 100);
@@ -221,7 +221,7 @@ function finishGame() {
         pbScoreTag.innerText = `${wpm} WPM`;
         title.innerText = "High Score Smashed!";
         msg.innerText = `You beat your previous best of ${currentBest} WPM!`;
-        fireConfetti(); // ESTOURAR CONFETES!
+        fireConfetti();
     } else {
         title.innerText = "Test Complete!";
         msg.innerText = "Solid run. Keep pushing to beat your high score.";
